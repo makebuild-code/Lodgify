@@ -1,7 +1,13 @@
-import { greetUser } from '$utils/greet';
+import { resetWebflow } from "src/webflow/reset-webflow"
 
-window.Webflow ||= [];
-window.Webflow.push(() => {
-  const name = 'John Doe';
-  greetUser(name);
-});
+class _App {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    resetWebflow();
+  }
+}
+
+export const App = new _App();
