@@ -6,5 +6,4 @@ export function resetWebflow() {
       wf.ready();
     });
   }
-
 }
