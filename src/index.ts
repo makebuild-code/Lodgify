@@ -1,4 +1,5 @@
 import { resetWebflow } from "src/webflow/reset-webflow"
+import { nav } from 'src/features/nav.js'
 
 class _App {
   constructor() {
@@ -8,6 +9,7 @@ class _App {
 
   init() {
     resetWebflow();
+    nav()
   }
 }
 
