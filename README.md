@@ -1,8 +1,8 @@
-# Finsweet Developer Starter
+# Lodgify Mini Project 2
 
-A starter template for both Client & Power projects.
+A Makebuild client project built using the Finsweet Developer Starter template.
 
-Before starting to work with this template, please take some time to read through the documentation.
+Before starting to work with this project, please take some time to read through the documentation.
 
 ## Reference
 
@@ -21,13 +21,13 @@ Before starting to work with this template, please take some time to read throug
   - [Continuous Deployment](#continuous-deployment)
   - [How to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm)
 
-## Included tools
+## Included tool(s)
 
 This template contains some preconfigured development tools:
 
 - [Typescript](https://www.typescriptlang.org/): A superset of Javascript that adds an additional layer of Typings, bringing more security and efficiency to the written code.
-- [Prettier](https://prettier.io/): Code formatting that assures consistency across all Finsweet's projects.
-- [ESLint](https://eslint.org/): Code linting that enforces industries' best practices. It uses [our own custom configuration](https://github.com/finsweet/eslint-config) to maintain consistency across all Finsweet's projects.
+- [Prettier](https://prettier.io/): Code formatting that assures consistency across projects.
+- [ESLint](https://eslint.org/): Code linting that enforces industries' best practices.
 - [Playwright](https://playwright.dev/): Fast and reliable end-to-end testing.
 - [esbuild](https://esbuild.github.io/): Javascript bundler that compiles, bundles and minifies the original Typescript files.
 - [Changesets](https://github.com/changesets/changesets): A way to manage your versioning and changelogs.
@@ -191,61 +191,25 @@ This template contains a set of predefined scripts in the `package.json` file:
 - `pnpm release`: This command is defined for [Changesets](https://github.com/changesets/changesets). You don't have to interact with it.
 - `pnpm run update`: Scans the dependencies of the project and provides an interactive UI to select the ones that you want to update.
 
-## CI/CD
+## Deployment
 
-This template contains a set of helpers with proper CI/CD workflows.
+This project uses GitHub Actions to automatically deploy to Cloudflare Pages whenever changes are pushed to the `master` or `main` branch.
 
-### Continuous Integration
+### How it works
 
-When you open a Pull Request, a Continuous Integration workflow will run to:
+The deployment workflow:
 
-- Lint & check your code. It uses the `pnpm lint` and `pnpm check` commands under the hood.
-- Run the automated tests. It uses the `pnpm test` command under the hood.
+1. Triggers on pushes to `master` or `main`, or can be run manually
+2. Installs dependencies with npm
+3. Builds the project to the `dist/` folder
+4. Deploys the built files to Cloudflare Pages using Wrangler
 
-If any of these jobs fail, you will get a warning in your Pull Request and should try to fix your code accordingly.
+### Required secrets
 
-**Note:** If your project doesn't contain any defined tests in the `/tests` folder, you can skip the Tests workflow job by commenting it out in the `.github/workflows/ci.yml` file. This will significantly improve the workflow running times.
+The following GitHub secrets must be configured in the repository settings:
 
-### Continuous Deployment
+- `CLOUDFLARE_API_TOKEN`: Your Cloudflare API token
+- `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
+- `CLOUDFLARE_PAGES_PROJECT_NAME`: The name of your Cloudflare Pages project
 
-[Changesets](https://github.com/changesets/changesets) allows us to generate automatic changelog updates when merging a Pull Request to the `master` branch.
-
-Before starting, make sure to [enable full compatibility with Changesets in the repository](#how-to-enable-continuous-deployment-with-changesets).
-
-To generate a new changelog, run:
-
-```bash
-pnpm changeset
-```
-
-You'll be prompted with a few questions to complete the changelog.
-
-Once the Pull Request is merged into `master`, a new Pull Request will automatically be opened by a changesets bot that bumps the package version and updates the `CHANGELOG.md` file.
-You'll have to manually merge this new PR to complete the workflow.
-
-If an `NPM_TOKEN` secret is included in the repository secrets, Changesets will automatically deploy the new package version to npm.
-See [how to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm) for more info.
-
-#### How to enable Continuous Deployment with Changesets
-
-Some repositories may not have the required permissions to let Changesets interact with the repository.
-
-To enable full compatibility with Changesets, go to the repository settings (`Settings > Actions > General > Workflow Permissions`) and define:
-
-- ✅ Read and write permissions.
-- ✅ Allow GitHub Actions to create and approve pull requests.
-
-Enabling this setting for your organization account (`Account Settings > Actions > General`) could help streamline the process. By doing so, any new repos created under the org will automatically inherit the setting, which can save your teammates time and effort. This can only be applied to organization accounts at the time.
-
-#### How to automatically deploy updates to npm
-
-As mentioned before, Changesets will automatically deploy the new package version to npm if an `NPM_TOKEN` secret is provided.
-
-This npm token should be:
-
-- From Finsweet's npm organization if this repository is meant for internal/product development.
-- From a client's npm organization if this repository is meant for client development. In this case, you should ask the client to [create an npm account](https://www.npmjs.com/signup) and provide you the credentials (or the npm token, if they know how to get it).
-
-Once you're logged into the npm account, you can get an access token by following [this guide](https://docs.npmjs.com/creating-and-viewing-access-tokens).
-
-The access token must be then placed in a [repository secret](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-encrypted-secrets-for-your-repository-and-organization-for-codespaces#adding-secrets-for-a-repository) named `NPM_TOKEN`.
+Once configured, every push to the main branch will automatically deploy your changes to Cloudflare.
