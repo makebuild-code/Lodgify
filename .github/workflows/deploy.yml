@@ -29,7 +29,6 @@ jobs:
         run: npm install
 
       - name: Run npm deploy script (build to dist/)
-        # assumes package.json has: "deploy": "bun ./bin/deploy.ts"
         run: bun run build
 
       - name: Deploy dist/ to Cloudflare Pages via Wrangler
