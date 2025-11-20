@@ -21,7 +21,7 @@ Before starting to work with this project, please take some time to read through
   - [Continuous Deployment](#continuous-deployment)
   - [How to automatically deploy updates to npm](#how-to-automatically-deploy-updates-to-npm)
 
-## Included tools
+## Included tool(s)
 
 This template contains some preconfigured development tools:
 
