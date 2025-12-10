@@ -12,7 +12,8 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_PAGES_PROJECT_NAME: ${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME }}
+      # API token and account ID are required. Project name and production branch
+      # are computed in a preparatory step (below) so we can validate secrets.
 
     steps:
       - name: Checkout repository
@@ -29,13 +30,44 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Prepare Pages project info
+        id: prepare-pages
+        run: |
+          # Determine selected project and production branch, validate staging secret
+          REF_NAME="${{ github.ref_name }}"
+          PROD_PROJECT="${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME }}"
+          STAGING_PROJECT="${{ secrets.CLOUDFLARE_PAGES_PROJECT_NAME_STAGING }}"
+
+          echo "ref_name=$REF_NAME"
+
+          if [ "$REF_NAME" = "development" ]; then
+            if [ -z "$STAGING_PROJECT" ]; then
+              echo "Missing secret CLOUDFLARE_PAGES_PROJECT_NAME_STAGING for development branch." >&2
+              echo "Please add repository secret CLOUDFLARE_PAGES_PROJECT_NAME_STAGING with your staging Pages project name." >&2
+              exit 1
+            fi
+            echo "selected_project=$STAGING_PROJECT" >> $GITHUB_OUTPUT
+            echo "production_branch=development" >> $GITHUB_OUTPUT
+          elif [ "$REF_NAME" = "master" ]; then
+            echo "selected_project=$PROD_PROJECT" >> $GITHUB_OUTPUT
+            echo "production_branch=master" >> $GITHUB_OUTPUT
+          else
+            echo "selected_project=$PROD_PROJECT" >> $GITHUB_OUTPUT
+            echo "production_branch=main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Debug: Pages project and branch"
+        run: |
+          echo "Using Pages project: ${{ steps.prepare-pages.outputs.selected_project }}"
+          echo "Production branch to set on Pages project: ${{ steps.prepare-pages.outputs.production_branch }}"
+
       - name: Ensure Pages project exists (idempotent)
         uses: cloudflare/wrangler-action@v3
         continue-on-error: true
         with:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages project create ${{ env.CLOUDFLARE_PAGES_PROJECT_NAME }} --production-branch=main
+          command: pages project create ${{ steps.prepare-pages.outputs.selected_project }} --production-branch=${{ steps.prepare-pages.outputs.production_branch }}
 
       - name: Deploy to Cloudflare Pages
         id: deploy
@@ -47,5 +79,5 @@ jobs:
           # Use current branch instead of hardcoding "main"
           command: >
             pages deploy dist
-            --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT_NAME }}
+            --project-name=${{ steps.prepare-pages.outputs.selected_project }}
             --branch=${{ github.ref_name }}
