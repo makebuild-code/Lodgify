@@ -81,3 +81,18 @@ jobs:
             pages deploy dist
             --project-name=${{ steps.prepare-pages.outputs.selected_project }}
             --branch=${{ github.ref_name }}
+
+      - name: Print deployment-url
+        if: always()
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            echo "Deployment URL: $DEPLOYMENT_URL"
+            exit 0
+          fi
+
+          echo "steps.deploy.outputs.deployment-url is empty. Showing known alternative outputs (if any):"
+          echo "  deployment-url: '${{ steps.deploy.outputs.deployment-url }}'"
+          echo "  url: '${{ steps.deploy.outputs.url }}'"
+          echo "  preview_url: '${{ steps.deploy.outputs.preview_url }}'"
