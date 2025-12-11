@@ -13,8 +13,10 @@ export async function pricing() {
   let initialLoad = true
 
   document.documentElement.classList.add('js');
-  const wrap = document.querySelector('.pricing_cards_container')
-  wrap.style.opacity = '0';
+  const wrap = document.querySelector('.pricing_cards_container');
+  if (wrap) {
+    wrap.style.opacity = '0';
+  }
 
   function showWrap() {
     try {
@@ -37,6 +39,7 @@ export async function pricing() {
     // Default fallback
     baseUrl = 'https://subscriptions.lodgifyintegration.com';
   }
+
   // Fetch prices with error handling and normalise responses.
   let pricesData = { eur: null, usd: null, gbp: null }
   // Cached canonical plans for the selected currency to avoid double-normalising
@@ -186,7 +189,21 @@ export async function pricing() {
     const pricingPriceElements = document.querySelectorAll('[data-pricing="pro"] .pricing_price-no-border, [data-pricing="ultimate"] .pricing_price-no-border,  [data-pricing="starter-fee"] .pricing_price-no-border, [data-pricing="starter-no-fee"] .pricing_price-no-border, [data-pricing="slim"] .pricing_price-no-border')
 
     try {
-      const canonical = canonicalPlans
+      const canonical = canonicalPlans;
+
+      const planCount = canonical && typeof canonical === 'object' ? Object.keys(canonical).length : 0;
+      const compareRows = document.querySelectorAll('.compare_row.col-5');
+      const compareContainer = document.querySelector('.compare_contain .u-grid-wrapper .u-grid');
+      compareRows.forEach((row) => {
+        if (planCount === 3) {
+          row.style.setProperty('--_column-count---value', '4');
+          compareContainer.style.setProperty('--_column-count---value', '4');
+        } else if (planCount === 4) {
+          //set property --_column-count---value on .compare_row.col-5 to 4
+          row.style.setProperty('--_column-count---value', '5');
+          compareContainer.style.setProperty('--_column-count---value', '5');
+        }
+      })
 
       pricingPriceElements.forEach((e) => {
         const planRoot = e.closest('[data-pricing]')
@@ -237,6 +254,7 @@ export async function pricing() {
     } catch (err) {
       console.warn('Failed to toggle plan slot visibility', err)
     }
+
     // update all the prices with GSAP text animation
     prices.forEach((e) => {
       let element = e.querySelector('strong')
