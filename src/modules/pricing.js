@@ -595,7 +595,7 @@ export async function pricing() {
                 // Don't run this block for nodes inside comparison detail blocks
                 if (node.closest && node.closest('.compare_detail_wrap')) return;
 
-                const label = `Max ${nearestLower} ${nearestLower === 1 ? 'property' : 'properties'}`;
+                // const label = `Max ${nearestLower} ${nearestLower === 1 ? 'property' : 'properties'}`;
                 const buttonContainer = node.querySelector('.button_main_text');
                 let buttonTextEl = buttonContainer ? buttonContainer.querySelector('strong') : null;
                 if (!buttonTextEl) buttonTextEl = buttonContainer || node;
@@ -605,39 +605,17 @@ export async function pricing() {
                   node.dataset.originalText = (buttonTextEl.textContent || '').trim();
                 }
 
-                if (buttonTextEl) buttonTextEl.textContent = label;
+                // if (buttonTextEl) buttonTextEl.textContent = label;
 
-                // Add or update the helper note under the button (only on first instance)
+                // Show the helper note under the button (only on first instance)
                 try {
                   const noteSelector = '.plan-limited-note'
                   let noteEl = node.querySelector(noteSelector)
-                  const noteText = `This plan is only available for ${nearestLower} ${nearestLower === 1 ? 'property or less' : 'properties or less'}.`
-                  if (isFirstInstance) {
-                    if (!noteEl) {
-                      noteEl = document.createElement('span')
-                      noteEl.className = 'plan-limited-note'
-                      noteEl.textContent = noteText
-
-                      noteEl.style.display = 'block';
-                      noteEl.style.marginTop = '0.875rem';
-                      noteEl.style.fontSize = '1rem';
-                      noteEl.style.color = '#51B293';
-                      noteEl.style.fontWeight = '700';
-
-                      const buttonWrap = node.querySelector('.button_main_wrap')
-                      if (buttonWrap && buttonWrap.parentNode) {
-                        buttonWrap.parentNode.insertBefore(noteEl, buttonWrap.nextSibling)
-                      } else if (buttonContainer && buttonContainer.parentNode) {
-                        buttonContainer.parentNode.insertBefore(noteEl, buttonContainer.nextSibling)
-                      } else {
-                        node.appendChild(noteEl)
-                      }
-                    } else {
-                      noteEl.textContent = noteText
-                    }
+                  if (isFirstInstance && noteEl) {
+                    noteEl.style.display = "block"
                   }
                 } catch (err) {
-                  console.warn('Failed to add/update plan limited note', err)
+                  console.warn('Failed to show plan limited note', err)
                 }
 
                 // Ensure any `.pricing_price-original.in-comparison-block` within this node is hidden
@@ -667,9 +645,11 @@ export async function pricing() {
                     }
                   }
 
-                  // Remove the helper note if present
+                  // Hide the helper note if present
                   const noteEl = node.querySelector('.plan-limited-note')
-                  if (noteEl && noteEl.parentNode) noteEl.parentNode.removeChild(noteEl)
+                  if (noteEl) {
+                    noteEl.style.display = "none"
+                  }
                   const comparisonText = node.querySelector('.comparison_text_pricing');
                   if (comparisonText) comparisonText.style.opacity = '';
                   // Restore any comparison original price visibility
