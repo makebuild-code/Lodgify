@@ -341,17 +341,9 @@ export async function pricing() {
               const pct = attr !== null ? parseFloat(attr) : 20
               percentSpan.textContent = Number.isFinite(pct) ? String(Math.round(pct)) : '20'
             } else if (state.currentTimeFrame === 'BiYearly') {
-              // Display: prefer the Yearly attribute if present, otherwise use
-              // the biyearly attribute if present, otherwise default to 25.
-              const yearlyAttr = planRoot.getAttribute('data-discount-yearly')
-              if (yearlyAttr !== null) {
-                const pct = parseFloat(yearlyAttr)
-                percentSpan.textContent = Number.isFinite(pct) ? String(Math.round(pct)) : '25'
-              } else {
-                const biyearlyAttr = planRoot.getAttribute('data-discount-biyearly')
-                const pct = biyearlyAttr !== null ? parseFloat(biyearlyAttr) : 25
-                percentSpan.textContent = Number.isFinite(pct) ? String(Math.round(pct)) : '25'
-              }
+              const biyearlyAttr = planRoot.getAttribute('data-discount-biyearly')
+              const pct = biyearlyAttr !== null ? parseFloat(biyearlyAttr) : 25
+              percentSpan.textContent = Number.isFinite(pct) ? String(Math.round(pct)) : '25'
             }
           }
         } catch (err) {
