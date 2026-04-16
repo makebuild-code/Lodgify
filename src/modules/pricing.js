@@ -87,6 +87,7 @@ export async function pricing() {
   // Helper: map variable API plan type names to canonical keys used by the UI
   const PLAN_TYPE_MAP = {
     'Slim': 'slim',
+    'SlimNoPublish': 'slim',
     'NewBasic': 'starter-fee',
     'StarterNoFee': 'starter-no-fee',
     'Professional': 'pro',
